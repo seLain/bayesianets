@@ -1,2 +1,3 @@
 git+https://github.com/MaxHalford/vose
 git+https://github.com/MaxHalford/hedgehog
+graphviz

@@ -1,5 +1,6 @@
 import pandas as pd
 import hedgehog as hh
+from pprint import pprint
 
 '''
 = Decision Nodes =
@@ -70,9 +71,59 @@ bn.P['Suggest_AMEX_P'] = pd.Series({
 
 bn.prepare()
 
-print('Infer-1 ========')
+print('=== Probabilistic inference ===')
+
 result = bn.query('Suggest_CIP', event={'User_Owns_5_Cards': True, 'User_Reach_5_24': False, 'User_Has_CIP': False})
-print(type(result))
-print(result)
-print(result.keys())
 print(result.to_dict())
+
+result = bn.query('Suggest_AMEX_P', event={'User_Owns_5_Cards': True, 'User_Reach_5_24': False, 'User_Has_CIP': False})
+print(result.to_dict())
+
+print('=== Missing value imputation ===')
+
+sample = {
+    'User_Owns_5_Cards': False,
+    'User_Reach_5_24': False,
+    'User_Has_CIP': False,
+    'User_Has_AMEX_P': False,
+    'User_Has_AMEX_P_100K': False,
+    'Reach_5_24': None,
+    'Suggest_CIP': None,
+    'Suggest_AMEX_P': None,
+}
+
+sample = bn.impute(sample)
+pprint(sample)
+
+print('=== Likelihood estimation ===')
+try:
+    event = {
+        'User_Owns_5_Cards': False,
+        'User_Reach_5_24': False,
+        'User_Has_CIP': False,
+        'User_Has_AMEX_P': False,
+        'User_Has_AMEX_P_100K': False,
+        'Reach_5_24': False,
+        'Suggest_CIP': True,
+        'Suggest_AMEX_P': False,
+    }
+    print(bn.predict_proba(event))
+except KeyError as e:
+    print('Impossible state: %s' % str(e))
+
+print('=== Random sampling ===')
+
+print('sample once:')
+pprint(bn.sample())
+
+print('\nsample 5 times:')
+pprint(bn.sample(5))
+
+
+print('=== Parameter estimation ===')
+
+samples = bn.sample(100)
+bn = bn.fit(samples)
+dot = bn.graphviz()
+path = dot.render('asia', directory='figures', format='svg', cleanup=True)
+print('path: %s' % path)
