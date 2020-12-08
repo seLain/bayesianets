@@ -73,6 +73,9 @@ bn.prepare()
 
 print('=== Probabilistic inference ===')
 
+result = bn.query('Reach_5_24', event={'User_Owns_5_Cards': True, 'User_Reach_5_24': False, 'User_Has_CIP': False})
+print(result.to_dict())
+
 result = bn.query('Suggest_CIP', event={'User_Owns_5_Cards': True, 'User_Reach_5_24': False, 'User_Has_CIP': False})
 print(result.to_dict())
 
